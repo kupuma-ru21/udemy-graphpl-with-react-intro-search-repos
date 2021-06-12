@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ADD_STAR, REMOVE_STAR } from "../graphql";
+import { ADD_STAR, REMOVE_STAR, SEARCH_REPOSITORIES } from "../graphql";
 import { PER_PAGE, VARIABLES } from "../constants";
 
 export const useHooks = () => {
@@ -31,9 +31,32 @@ export const useHooks = () => {
       };
     });
   }, []);
-  const changeStar = useCallback((addStarMutation, id) => {
-    addStarMutation({ variables: { input: { starrableId: id } } });
-  }, []);
+  const changeStar = useCallback(
+    (mutation, id) => {
+      mutation({
+        variables: { input: { starrableId: id } },
+        update: (store) => {
+          const data = store.readQuery({
+            query: SEARCH_REPOSITORIES,
+            variables,
+          });
+          const edges = data.search.edges;
+          const newEdges = edges.map(({ node }) => {
+            if (node.id === id) {
+              const totalCount = node.stargazers.totalCount;
+              const diff = node.viewerHasStarred ? -1 : 1;
+              const newTotalCount = totalCount + diff;
+              node.stargazers.totalCount = newTotalCount;
+            }
+            return edges;
+          });
+          data.search.edges = newEdges;
+          store.writeQuery({ query: SEARCH_REPOSITORIES, data });
+        },
+      });
+    },
+    [variables]
+  );
   const mutation = useCallback((viewerHasStarred) => {
     return viewerHasStarred ? REMOVE_STAR : ADD_STAR;
   }, []);

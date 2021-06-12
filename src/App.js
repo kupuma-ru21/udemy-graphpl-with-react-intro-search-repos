@@ -40,12 +40,7 @@ const App = () => {
                       <a href={node.url} target="__blank">
                         {node.name}
                       </a>
-                      <Mutation
-                        mutation={mutation(node.viewerHasStarred)}
-                        refetchQueries={[
-                          { query: SEARCH_REPOSITORIES, variables },
-                        ]}
-                      >
+                      <Mutation mutation={mutation(node.viewerHasStarred)}>
                         {(mutation) => (
                           <StarButton
                             totalCount={node.stargazers.totalCount}
