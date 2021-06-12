@@ -1,11 +1,15 @@
 import { memo } from "react";
 
-const StarButton = ({ totalCount }) => {
+const StarButton = ({ totalCount, viewerHasStarred }) => {
   const starUnit = totalCount === 1 ? "star" : "stars";
+  const hasStarred = viewerHasStarred ? " | Starred" : " | -";
   return (
     <button>
-      {totalCount}
-      {starUnit}
+      <span>
+        {totalCount}
+        {starUnit}
+      </span>
+      <span>{hasStarred}</span>
     </button>
   );
 };

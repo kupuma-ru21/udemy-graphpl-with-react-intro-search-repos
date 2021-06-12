@@ -70,7 +70,10 @@ const App = () => {
                       <a href={node.url} target="__blank">
                         {node.name}
                       </a>
-                      <StarButton totalCount={node.stargazers.totalCount} />
+                      <StarButton
+                        totalCount={node.stargazers.totalCount}
+                        viewerHasStarred={node.viewerHasStarred}
+                      />
                     </li>
                   );
                 })}
