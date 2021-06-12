@@ -3,6 +3,7 @@ import { ApolloProvider, Query } from "react-apollo";
 import { client } from "./client";
 import { SEARCH_REPOSITORIES } from "./graphql";
 
+const PER_PAGE = 5;
 const VARIABLES = {
   first: 5,
   after: null,
@@ -18,11 +19,34 @@ const App = () => {
       return { ...oldVariables, query: e.target.value };
     });
   }, []);
+  const goNext = useCallback((endCursor) => {
+    setVariables((oldVariables) => {
+      return {
+        ...oldVariables,
+        after: endCursor,
+        first: PER_PAGE,
+        last: null,
+        before: null,
+      };
+    });
+  }, []);
+  const goPrev = useCallback((startCursor) => {
+    setVariables((oldVariables) => {
+      console.log(startCursor);
+      return {
+        ...oldVariables,
+        ...oldVariables,
+        after: null,
+        first: null,
+        last: PER_PAGE,
+        before: startCursor,
+      };
+    });
+  }, []);
 
   const { query } = variables;
   return (
     <ApolloProvider client={client}>
-      <div>Hello</div>
       <form>
         <input
           value={query}
@@ -36,6 +60,9 @@ const App = () => {
           if (error) return <>{error.message}</>;
           console.log(data.search);
           const search = data.search;
+          const pageInfo = data.search.pageInfo;
+          const { endCursor, hasNextPage, startCursor, hasPreviousPage } =
+            pageInfo;
           const repositoryUnit =
             search.repositoryCount === 1 ? "Repository" : "Repositories";
           return (
@@ -56,6 +83,12 @@ const App = () => {
                   );
                 })}
               </ul>
+              {hasPreviousPage && (
+                <button onClick={() => goPrev(startCursor)}>Prev</button>
+              )}
+              {hasNextPage && (
+                <button onClick={() => goNext(endCursor)}>Next</button>
+              )}
             </>
           );
         }}
