@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import { ApolloProvider, Query } from "react-apollo";
+import { ApolloProvider, Query, Mutation } from "react-apollo";
 import { client } from "./client";
-import { SEARCH_REPOSITORIES } from "./graphql";
+import { SEARCH_REPOSITORIES, ADD_STAR } from "./graphql";
 import { PER_PAGE, VARIABLES } from "./constants";
 import StarButton from "./components/StarButton";
 
@@ -22,6 +22,9 @@ const App = () => {
         before: null,
       };
     });
+  }, []);
+  const addStar = useCallback((addStarMutation, id) => {
+    addStarMutation({ variables: { input: { starrableId: id } } });
   }, []);
   const goPrev = useCallback((startCursor) => {
     setVariables((oldVariables) => {
@@ -64,16 +67,20 @@ const App = () => {
               </h2>
               <ul>
                 {search.edges.map(({ node }) => {
-                  console.log(node);
                   return (
                     <li key={node.id}>
                       <a href={node.url} target="__blank">
                         {node.name}
                       </a>
-                      <StarButton
-                        totalCount={node.stargazers.totalCount}
-                        viewerHasStarred={node.viewerHasStarred}
-                      />
+                      <Mutation mutation={ADD_STAR}>
+                        {(addStarMutation) => (
+                          <StarButton
+                            totalCount={node.stargazers.totalCount}
+                            viewerHasStarred={node.viewerHasStarred}
+                            onClick={() => addStar(addStarMutation, node.id)}
+                          />
+                        )}
+                      </Mutation>
                     </li>
                   );
                 })}
