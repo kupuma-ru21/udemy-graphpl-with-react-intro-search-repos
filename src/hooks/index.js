@@ -1,12 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ADD_STAR, REMOVE_STAR, SEARCH_REPOSITORIES } from "../graphql";
 import { PER_PAGE, VARIABLES } from "../constants";
 
 export const useHooks = () => {
   const [variables, setVariables] = useState(VARIABLES);
-  const handleChange = useCallback((e) => {
+  const myRef = useRef();
+  const handleSubmit = useCallback(() => {
     setVariables((oldVariables) => {
-      return { ...oldVariables, query: e.target.value };
+      return { ...oldVariables, variables: myRef.current.value };
     });
   }, []);
   const goNext = useCallback((endCursor) => {
@@ -62,11 +63,12 @@ export const useHooks = () => {
   }, []);
 
   return {
-    handleChange,
     goNext,
     goPrev,
     changeStar,
     mutation,
     variables,
+    myRef,
+    handleSubmit,
   };
 };

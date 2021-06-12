@@ -5,16 +5,12 @@ import { SEARCH_REPOSITORIES } from "./graphql";
 import { useHooks } from "./hooks";
 
 const App = () => {
-  const { handleChange, goNext, goPrev, changeStar, mutation, variables } =
-    useHooks();
+  const { goNext, goPrev, changeStar, mutation, variables, myRef } = useHooks();
   return (
     <ApolloProvider client={client}>
       <form>
-        <input
-          value={variables.query}
-          onChange={handleChange}
-          style={{ width: "200px" }}
-        />
+        <input style={{ width: "200px" }} ref={myRef} />
+        <input type="submit" value="Submit" />
       </form>
       <Query query={SEARCH_REPOSITORIES} variables={variables}>
         {({ loading, error, data }) => {
