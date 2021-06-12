@@ -1,52 +1,17 @@
-import { useCallback, useState } from "react";
 import { ApolloProvider, Query, Mutation } from "react-apollo";
-import { client } from "./client";
-import { SEARCH_REPOSITORIES, ADD_STAR, REMOVE_STAR } from "./graphql";
-import { PER_PAGE, VARIABLES } from "./constants";
 import StarButton from "./components/StarButton";
+import { client } from "./client";
+import { SEARCH_REPOSITORIES } from "./graphql";
+import { useHooks } from "./hooks";
 
 const App = () => {
-  const [variables, setVariables] = useState(VARIABLES);
-  const handleChange = useCallback((e) => {
-    setVariables((oldVariables) => {
-      return { ...oldVariables, query: e.target.value };
-    });
-  }, []);
-  const goNext = useCallback((endCursor) => {
-    setVariables((oldVariables) => {
-      return {
-        ...oldVariables,
-        after: endCursor,
-        first: PER_PAGE,
-        last: null,
-        before: null,
-      };
-    });
-  }, []);
-  const changeStar = useCallback((addStarMutation, id) => {
-    addStarMutation({ variables: { input: { starrableId: id } } });
-  }, []);
-  const goPrev = useCallback((startCursor) => {
-    setVariables((oldVariables) => {
-      return {
-        ...oldVariables,
-        after: null,
-        first: null,
-        last: PER_PAGE,
-        before: startCursor,
-      };
-    });
-  }, []);
-  const mutation = useCallback((viewerHasStarred) => {
-    return viewerHasStarred ? REMOVE_STAR : ADD_STAR;
-  }, []);
-
-  const { query } = variables;
+  const { handleChange, goNext, goPrev, changeStar, mutation, variables } =
+    useHooks();
   return (
     <ApolloProvider client={client}>
       <form>
         <input
-          value={query}
+          value={variables.query}
           onChange={handleChange}
           style={{ width: "200px" }}
         />
