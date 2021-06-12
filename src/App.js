@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { ApolloProvider, Query, Mutation } from "react-apollo";
 import { client } from "./client";
-import { SEARCH_REPOSITORIES, ADD_STAR } from "./graphql";
+import { SEARCH_REPOSITORIES, ADD_STAR, REMOVE_STAR } from "./graphql";
 import { PER_PAGE, VARIABLES } from "./constants";
 import StarButton from "./components/StarButton";
 
@@ -23,7 +23,7 @@ const App = () => {
       };
     });
   }, []);
-  const addStar = useCallback((addStarMutation, id) => {
+  const changeStar = useCallback((addStarMutation, id) => {
     addStarMutation({ variables: { input: { starrableId: id } } });
   }, []);
   const goPrev = useCallback((startCursor) => {
@@ -36,6 +36,9 @@ const App = () => {
         before: startCursor,
       };
     });
+  }, []);
+  const mutation = useCallback((viewerHasStarred) => {
+    return viewerHasStarred ? REMOVE_STAR : ADD_STAR;
   }, []);
 
   const { query } = variables;
@@ -72,12 +75,12 @@ const App = () => {
                       <a href={node.url} target="__blank">
                         {node.name}
                       </a>
-                      <Mutation mutation={ADD_STAR}>
-                        {(addStarMutation) => (
+                      <Mutation mutation={mutation(node.viewerHasStarred)}>
+                        {(mutation) => (
                           <StarButton
                             totalCount={node.stargazers.totalCount}
                             viewerHasStarred={node.viewerHasStarred}
-                            onClick={() => addStar(addStarMutation, node.id)}
+                            onClick={() => changeStar(mutation, node.id)}
                           />
                         )}
                       </Mutation>
