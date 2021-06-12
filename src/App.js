@@ -39,10 +39,24 @@ const App = () => {
           const repositoryUnit =
             search.repositoryCount === 1 ? "Repository" : "Repositories";
           return (
-            <h2>
-              GitHub Repositories Search Results - {data.search.repositoryCount}
-              {repositoryUnit}
-            </h2>
+            <>
+              <h2>
+                GitHub Repositories Search Results -
+                {data.search.repositoryCount}
+                {repositoryUnit}
+              </h2>
+              <ul>
+                {search.edges.map(({ node }) => {
+                  return (
+                    <li key={node.id}>
+                      <a href={node.url} target="__blank">
+                        {node.name}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
           );
         }}
       </Query>
