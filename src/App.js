@@ -1,14 +1,6 @@
-import { gql } from "apollo-boost";
 import { ApolloProvider, Query } from "react-apollo";
 import { client } from "./client";
-
-const ME = gql`
-  query me {
-    viewer {
-      login
-    }
-  }
-`;
+import { ME } from "./graphql";
 
 const App = () => {
   return (
