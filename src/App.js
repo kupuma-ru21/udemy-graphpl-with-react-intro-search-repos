@@ -2,15 +2,8 @@ import { useCallback, useState } from "react";
 import { ApolloProvider, Query } from "react-apollo";
 import { client } from "./client";
 import { SEARCH_REPOSITORIES } from "./graphql";
-
-const PER_PAGE = 5;
-const VARIABLES = {
-  first: 5,
-  after: null,
-  last: null,
-  before: null,
-  query: "フロントエンドエンジニア",
-};
+import { PER_PAGE, VARIABLES } from "./constants";
+import StarButton from "./components/StarButton";
 
 const App = () => {
   const [variables, setVariables] = useState(VARIABLES);
@@ -32,9 +25,7 @@ const App = () => {
   }, []);
   const goPrev = useCallback((startCursor) => {
     setVariables((oldVariables) => {
-      console.log(startCursor);
       return {
-        ...oldVariables,
         ...oldVariables,
         after: null,
         first: null,
@@ -58,7 +49,6 @@ const App = () => {
         {({ loading, error, data }) => {
           if (loading) return "loading...";
           if (error) return <>{error.message}</>;
-          console.log(data.search);
           const search = data.search;
           const pageInfo = data.search.pageInfo;
           const { endCursor, hasNextPage, startCursor, hasPreviousPage } =
@@ -74,11 +64,13 @@ const App = () => {
               </h2>
               <ul>
                 {search.edges.map(({ node }) => {
+                  console.log(node);
                   return (
                     <li key={node.id}>
                       <a href={node.url} target="__blank">
                         {node.name}
                       </a>
+                      <StarButton totalCount={node.stargazers.totalCount} />
                     </li>
                   );
                 })}
